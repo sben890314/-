@@ -453,57 +453,26 @@
 }
 
     // --- 測驗邏輯 ---
-    function startQuiz(subjectKey) {
+        function startQuiz(subjectKey) {
         currentSubject = subject;
     
-    // 1. 從大題庫中複製該科目的完整題目（約 1040 題）
-    const allQuestions = [...db[subject]]; 
+        // 1. 從大題庫中複製該科目的完整題目（約 1040 題）
+        const allQuestions = [...db[subject]]; 
     
-    // 2. 將這千題隨機打亂順序，並精確切出前 40 題
-    quizPool = allQuestions
+        // 2. 將這千題隨機打亂順序，並精確切出前 40 題
+        quizPool = allQuestions
         .sort(() => Math.random() - 0.5)
         .slice(0, 40); 
 
-    // 3. 重設測驗狀態
-    currentIdx = 0;
-    score = 0;
-    userAnswers = new Array(quizPool.length).fill(null);
+        // 3. 重設測驗狀態
+        currentIdx = 0;
+        score = 0;
+        userAnswers = new Array(quizPool.length).fill(null);
     
-    // 4. 切換畫面並顯示第一題
-    showScreen('screen-quiz');
-    renderQuestion();
-        let pool = db[subjectKey];
-        if (!pool || pool.length === 0) { alert("此科目無題目"); return; }
-
-        let mappedPool = pool.map((item, idx) => ({ ...item, originalIndex: idx }));
-        
-        const onlyUnmastered = document.getElementById('mode-toggle').checked;
-        let finalQuestions = [];
-
-        if (onlyUnmastered) {
-            const masteredList = masteryData[subjectKey] || [];
-            let unmastered = mappedPool.filter(q => !masteredList.includes(q.originalIndex));
-            
-            if (unmastered.length === 0) {
-                if(!confirm("恭喜！本科目所有題目皆已熟練。\n要重新練習全部題目嗎？")) return;
-                finalQuestions = mappedPool;
-            } else {
-                finalQuestions = unmastered;
-            }
-        } else {
-            finalQuestions = mappedPool;
-        }
-
-        finalQuestions.sort(() => 0.5 - Math.random());
-        currentQuiz = finalQuestions.slice(0, 40);
-        currentSubject = subjectKey;
-
-        currentIndex = 0;
-        currentScore = 0;
-        wrongLog = [];
-        
+        // 4. 切換畫面並顯示第一題
         showScreen('screen-quiz');
         renderQuestion();
+       
     }
 
     function renderQuestion() {
