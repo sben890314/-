@@ -453,26 +453,45 @@
 }
 
     // --- 測驗邏輯 ---
-        function startQuiz(subjectKey) {
-        currentSubject = subject;
+    // --- 測驗邏輯 ---
+    function startQuiz(subjectKey) {
+        // 1. 強制將變數對齊，防止 subject 變成未定義
+        currentSubject = subjectKey; 
     
-        // 1. 從大題庫中複製該科目的完整題目（約 1040 題）
-        const allQuestions = [...db[subject]]; 
+        // 2. 安全檢查：確認大題庫裡面有沒有這個科目
+        if (!db || !db[subjectKey]) {
+            alert("題庫尚未載入完成，請稍候再試！");
+            return;
+        }
+        
+        // 3. 複製該科目的完整題目陣列
+        const allQuestions = [...db[subjectKey]]; 
     
-        // 2. 將這千題隨機打亂順序，並精確切出前 40 題
-        quizPool = allQuestions
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 40); 
+        // 4. 使用高效 Fisher-Yates 演算法隨機抽 40 題
+        currentQuiz = []; 
+        const numToExtract = Math.min(40, allQuestions.length); 
+        
+        for (let i = 0; i < numToExtract; i++) {
+            const randomIndex = Math.floor(Math.random() * allQuestions.length);
+            
+            // 塞入題目，並補上原始索引供熟練度系統使用
+            currentQuiz.push({
+                ...allQuestions[randomIndex],
+                originalIndex: randomIndex
+            });
+            
+            // 移除已抽取的題目
+            allQuestions.splice(randomIndex, 1);
+        }
 
-        // 3. 重設測驗狀態
-        currentIdx = 0;
-        score = 0;
-        userAnswers = new Array(quizPool.length).fill(null);
+        // 5. 初始化測驗計數器
+        currentIndex = 0;   
+        currentScore = 0;   
+        wrongLog = [];      
     
-        // 4. 切換畫面並顯示第一題
+        // 6. 切換畫面並顯示第一題
         showScreen('screen-quiz');
         renderQuestion();
-       
     }
 
     function renderQuestion() {
